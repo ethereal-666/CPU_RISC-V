@@ -3,30 +3,12 @@
 # SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
 # IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
 # SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
-# Start of session at: Tue Jul 14 14:26:51 2026
-# Process ID: 3212
+# Start of session at: Fri Jul 17 15:55:52 2026
+# Process ID: 41968
 # Current directory: D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic
-# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent4404 D:\file\experiment\cpu\miniLA_basic_minisys\miniLA_basic\miniLA.xpr
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent40996 D:\file\experiment\cpu\miniLA_basic_minisys\miniLA_basic\miniLA.xpr
 # Log file: D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/vivado.log
 # Journal file: D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic\vivado.jou
 # Running On: LAPTOP-0V8PR2V8, OS: Windows, CPU Frequency: 2395 MHz, CPU Physical cores: 32, Host memory: 33517 MB
 #-----------------------------------------------------------
-start_gui
-open_project D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.xpr
-update_compile_order -fileset sources_1
-generate_target Simulation [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/DRAM/DRAM.xci]
-export_ip_user_files -of_objects [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/DRAM/DRAM.xci] -no_script -sync -force -quiet
-export_simulation -of_objects [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/DRAM/DRAM.xci] -directory D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files/sim_scripts -ip_user_files_dir D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files -ipstatic_source_dir D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files/ipstatic -lib_map_path [list {modelsim=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/modelsim} {questa=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/questa} {riviera=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/riviera} {activehdl=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/activehdl}] -use_ip_compiled_libs -force -quiet
-generate_target Simulation [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/IROM/IROM.xci]
-export_ip_user_files -of_objects [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/IROM/IROM.xci] -no_script -sync -force -quiet
-export_simulation -of_objects [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/IROM/IROM.xci] -directory D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files/sim_scripts -ip_user_files_dir D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files -ipstatic_source_dir D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files/ipstatic -lib_map_path [list {modelsim=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/modelsim} {questa=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/questa} {riviera=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/riviera} {activehdl=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/activehdl}] -use_ip_compiled_libs -force -quiet
-generate_target all [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/clk_wiz_0/clk_wiz_0.xci]
-export_ip_user_files -of_objects [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/clk_wiz_0/clk_wiz_0.xci] -no_script -sync -force -quiet
-export_simulation -of_objects [get_files D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/src/rtl/ip/clk_wiz_0/clk_wiz_0.xci] -directory D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files/sim_scripts -ip_user_files_dir D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files -ipstatic_source_dir D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.ip_user_files/ipstatic -lib_map_path [list {modelsim=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/modelsim} {questa=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/questa} {riviera=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/riviera} {activehdl=D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.cache/compile_simlib/activehdl}] -use_ip_compiled_libs -force -quiet
-launch_run clk_wiz_0_synth_1
-wait_on_run clk_wiz_0_synth_1
-
-launch_simulation
-open_wave_config D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/soc_simple_tb.wcfg
-source soc_simple_tb.tcl
-close_sim
+start_guioopen_project D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.xpruupdate_compile_order -fileset sources_1l

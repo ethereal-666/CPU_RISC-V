@@ -7,6 +7,7 @@
 `define PC_INIT_VAL 32'h0
 
 `define NPC_PC4     2'b00
+`define NPC_JIRL    2'b01
 `define NPC_BRCH    2'b10
 `define NPC_JMP     2'b11
 
@@ -18,10 +19,28 @@
 `define EXT_26      3'b101
 
 `define ALU_ADD     5'h00
+`define ALU_SUB     5'h01
+`define ALU_AND     5'h02
 `define ALU_OR      5'h03
+`define ALU_XOR     5'h04
+`define ALU_SLT     5'h05
 `define ALU_SLL     5'h06
+`define ALU_SRL     5'h07
+`define ALU_SRA     5'h08
+`define ALU_SLTU    5'h09
 `define ALU_BEQ     5'h0B
 `define ALU_BNE     5'h0C
+`define ALU_BLT     5'h0D
+`define ALU_BGE     5'h0E
+`define ALU_BLTU    5'h0F
+`define ALU_BGEU    5'h10
+`define ALU_MUL     5'h11
+`define ALU_MULH    5'h12
+`define ALU_MULHU   5'h13
+`define ALU_DIV     5'h14
+`define ALU_DIVU    5'h15
+`define ALU_MOD     5'h16
+`define ALU_MODU    5'h17
 
 `define RAM_EXT_N   3'b000
 `define RAM_EXT_W   3'b001
@@ -50,6 +69,7 @@
 `define WB_ALU      2'b11
 `define WB_RAM      2'b01
 `define WB_EXT      2'b10
+`define WB_PC4      2'b00
 
 // Address Space
 `define MEM_BLOCK_MEMORY    32'h0000_0000   // 512KB (0x0000_0000 ~ 0x0007_FFFF)

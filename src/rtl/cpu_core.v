@@ -92,6 +92,7 @@ module cpu_core(
     NPC U_NPC (
         .op         (npc_op),
         .pc         (pc),
+        .base       (rf_rd1),
         .offset     (ext),
         .br         (br),
         .npc        (npc),
@@ -190,7 +191,7 @@ module cpu_core(
         .da_addr    (da_addr),
 
         .ram_wop    (ram_wop),
-        .ram_wdata  (32'h0),
+        .ram_wdata  (rf_rd2),
         .da_wen     (da_wen),
         .da_wdata   (da_wdata)
     );
@@ -230,12 +231,19 @@ module cpu_core(
     assign rf_wR1 = ld_st_flag | mul_div_flag ? rf_wR_r : rf_wR;
 
     always @(*) begin
-        casex ({ld_st_flag, rf_wsel})
-            {1'b0, `WB_ALU}: rf_wD = alu_c;
-            {1'b0, `WB_EXT}: rf_wD = ext;
-            {1'b1, 2'b??  }: rf_wD = ram_ext;
-            default        : rf_wD = 32'h0;
-        endcase
+        if (ld_st_flag)
+            rf_wD = ram_ext;
+        else if (mul_div_flag)
+            rf_wD = alu_c;
+        else begin
+            case (rf_wsel)
+                `WB_ALU: rf_wD = alu_c;
+                `WB_RAM: rf_wD = ram_ext;
+                `WB_EXT: rf_wD = ext;
+                `WB_PC4: rf_wD = pc4;
+                default: rf_wD = 32'h0;
+            endcase
+        end
     end
 
     assign inst_finished = ld_st_flag   & ld_st_done    |           // 访存指令在读写完毕时执行完成

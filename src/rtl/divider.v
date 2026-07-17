@@ -1,18 +1,87 @@
 `timescale 1ns / 1ps
 
 module divider #(
-    parameter WIDTH = 32
+    parameter WIDTH = 32,
+    parameter SIGNED_OP = 1'b0
 )(
-    input  wire       clk,
-    input  wire       rst,
+    input  wire             clk,
+    input  wire             rst,
     input  wire [WIDTH-1:0] x,
     input  wire [WIDTH-1:0] y,
-    input  wire       start,
-    output wire [WIDTH-1:0] z,
+    input  wire             start,
+    output reg  [WIDTH-1:0] z,
     output reg  [WIDTH-1:0] r,
-    output reg        busy     
+    output reg              busy
 );
 
-    // TODO
-	
+    reg [WIDTH-1:0] dividend;
+    reg [WIDTH-1:0] divisor;
+    reg [WIDTH-1:0] quotient;
+    reg [WIDTH  :0] remainder;
+    reg [WIDTH  :0] count;
+    reg              quotient_negative;
+    reg              remainder_negative;
+
+    wire x_negative = SIGNED_OP && x[WIDTH-1];
+    wire y_negative = SIGNED_OP && y[WIDTH-1];
+    wire [WIDTH-1:0] x_abs = x_negative ? (~x + 1'b1) : x;
+    wire [WIDTH-1:0] y_abs = y_negative ? (~y + 1'b1) : y;
+
+    reg [WIDTH  :0] remainder_next;
+    reg [WIDTH-1:0] quotient_next;
+    always @(*) begin
+        remainder_next = {remainder[WIDTH-1:0], dividend[WIDTH-1]};
+        quotient_next  = {quotient[WIDTH-2:0], 1'b0};
+        if (remainder_next >= {1'b0, divisor}) begin
+            remainder_next = remainder_next - {1'b0, divisor};
+            quotient_next[0] = 1'b1;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            z                  <= {WIDTH{1'b0}};
+            r                  <= {WIDTH{1'b0}};
+            dividend           <= {WIDTH{1'b0}};
+            divisor            <= {WIDTH{1'b0}};
+            quotient           <= {WIDTH{1'b0}};
+            remainder          <= {(WIDTH+1){1'b0}};
+            count              <= {(WIDTH+1){1'b0}};
+            quotient_negative  <= 1'b0;
+            remainder_negative <= 1'b0;
+            busy               <= 1'b0;
+        end else if (start && !busy) begin
+            dividend           <= x_abs;
+            divisor            <= y_abs;
+            quotient           <= {WIDTH{1'b0}};
+            remainder          <= {(WIDTH+1){1'b0}};
+            count              <= WIDTH;
+            quotient_negative  <= x_negative ^ y_negative;
+            remainder_negative <= x_negative;
+            busy               <= 1'b1;
+            if (y_abs == {WIDTH{1'b0}}) begin
+                z     <= {WIDTH{1'b1}};
+                r     <= x;
+                count <= 1;
+            end
+        end else if (busy) begin
+            count <= count - 1'b1;
+            if (divisor == {WIDTH{1'b0}}) begin
+                busy <= 1'b0;
+            end else begin
+                dividend  <= dividend << 1;
+                quotient  <= quotient_next;
+                remainder <= remainder_next;
+                if (count == 1) begin
+                    z    <= quotient_negative ?
+                                (~quotient_next + 1'b1) : quotient_next;
+                    r    <= remainder_negative ?
+                                (~remainder_next[WIDTH-1:0] + 1'b1) :
+                                  remainder_next[WIDTH-1:0];
+                    busy <= 1'b0;
+                end
+            end
+        end
+    end
+
 endmodule

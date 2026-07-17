@@ -16,7 +16,7 @@ always @(*) begin
         `EXT_20 : ext = {imm[24:5], 12'h0};
         `EXT_16 : ext = {{14{imm[25]}}, imm[25:10], 2'h0};
         `EXT_26 : ext = {{4{imm[9]}}, imm[9:0], imm[25:10], 2'h0};
-        default : ext = {27'h0, imm[14:10]};
+        default : ext = 32'h0;
     endcase
 end
 
