@@ -1,0 +1,16 @@
+#-----------------------------------------------------------
+# xsim v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Fri Jul 17 16:25:07 2026
+# Process ID: 2756
+# Current directory: D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.sim/sim_1/behav/xsim
+# Command line: xsim.exe -log simulate.log -mode tcl -source {xsim.dir/soc_simple_tb_behav/xsim_script.tcl}
+# Log file: D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.sim/sim_1/behav/xsim/simulate.log
+# Journal file: D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/miniLA.sim/sim_1/behav/xsim\xsim.jou
+# Running On: LAPTOP-0V8PR2V8, OS: Windows, CPU Frequency: 2395 MHz, CPU Physical cores: 32, Host memory: 33517 MB
+#-----------------------------------------------------------
+source xsim.dir/soc_simple_tb_behav/xsim_script.tcl
+open_wave_config D:/file/experiment/cpu/miniLA_basic_minisys/miniLA_basic/soc_simple_tb.wcfg
+source soc_simple_tb.tcl

@@ -30,29 +30,67 @@ module multiplier #(
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            z            <= {O_WID{1'b0}};
+            z <= {O_WID{1'b0}};
+        end else if (busy_r && (count == 1)) begin
+            z <= negative ? (~product_next + 1'b1) : product_next;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
             multiplicand <= {O_WID{1'b0}};
-            multiplier   <= {WIDTH{1'b0}};
-            product      <= {O_WID{1'b0}};
-            count        <= {(WIDTH+1){1'b0}};
-            negative     <= 1'b0;
-            busy_r       <= 1'b0;
         end else if (start && !busy_r) begin
             multiplicand <= {{WIDTH{1'b0}}, x_abs};
-            multiplier   <= y_abs;
-            product      <= {O_WID{1'b0}};
-            count        <= WIDTH;
-            negative     <= x[WIDTH-1] ^ y[WIDTH-1];
-            busy_r       <= 1'b1;
         end else if (busy_r) begin
-            product      <= product_next;
             multiplicand <= multiplicand << 1;
-            multiplier   <= multiplier >> 1;
-            count        <= count - 1'b1;
-            if (count == 1) begin
-                z      <= negative ? (~product_next + 1'b1) : product_next;
-                busy_r <= 1'b0;
-            end
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            multiplier <= {WIDTH{1'b0}};
+        end else if (start && !busy_r) begin
+            multiplier <= y_abs;
+        end else if (busy_r) begin
+            multiplier <= multiplier >> 1;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            product <= {O_WID{1'b0}};
+        end else if (start && !busy_r) begin
+            product <= {O_WID{1'b0}};
+        end else if (busy_r) begin
+            product <= product_next;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            count <= {(WIDTH+1){1'b0}};
+        end else if (start && !busy_r) begin
+            count <= WIDTH;
+        end else if (busy_r) begin
+            count <= count - 1'b1;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            negative <= 1'b0;
+        end else if (start && !busy_r) begin
+            negative <= x[WIDTH-1] ^ y[WIDTH-1];
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            busy_r <= 1'b0;
+        end else if (start && !busy_r) begin
+            busy_r <= 1'b1;
+        end else if (busy_r && (count == 1)) begin
+            busy_r <= 1'b0;
         end
     end
 

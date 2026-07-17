@@ -21,29 +21,40 @@ module MREQ (
 
     // 产生写访存请求（da_wen、da_wdata）
     always @(*) begin
-        // default value
-        da_wen   = 4'h0;
-        da_wdata = ram_wdata;
+        da_wen = 4'h0;
 
         case (ram_wop)
             `RAM_WE_B: begin                            // st.b
-                da_wen   = ram_wop << offset;
-                da_wdata = ram_wdata << {offset, 3'b000};
+                da_wen = ram_wop << offset;
             end
             `RAM_WE_H: begin                            // st.h
                 if (offset[0] == 1'b0) begin
-                    da_wen   = ram_wop << offset;
-                    da_wdata = ram_wdata << {offset, 3'b000};
+                    da_wen = ram_wop << offset;
                 end
             end
             `RAM_WE_W:                                  // st.w
                 if (offset == 2'h0) begin
-                    da_wen   = ram_wop;
+                    da_wen = ram_wop;
                 end
         endcase
     end
 
     // 产生读访存请求（da_ren）
+    always @(*) begin
+        da_wdata = ram_wdata;
+
+        case (ram_wop)
+            `RAM_WE_B: begin                            // st.b
+                da_wdata = ram_wdata << {offset, 3'b000};
+            end
+            `RAM_WE_H: begin                            // st.h
+                if (offset[0] == 1'b0) begin
+                    da_wdata = ram_wdata << {offset, 3'b000};
+                end
+            end
+        endcase
+    end
+
     always @(*) begin
         if (ram_rop != `RAM_EXT_N) begin
             case (ram_rop)

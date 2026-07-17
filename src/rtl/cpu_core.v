@@ -211,11 +211,31 @@ module cpu_core(
     always @(posedge cpu_clk or posedge cpu_rst) begin
         if (cpu_rst) begin
             daccess_ren   <= 4'h0;
-            daccess_wen   <= 4'h0;
         end else begin
             daccess_ren   <= da_ren;
+        end
+    end
+
+    always @(posedge cpu_clk or posedge cpu_rst) begin
+        if (cpu_rst) begin
+            daccess_addr  <= 32'h0;
+        end else begin
             daccess_addr  <= da_addr;
+        end
+    end
+
+    always @(posedge cpu_clk or posedge cpu_rst) begin
+        if (cpu_rst) begin
+            daccess_wen   <= 4'h0;
+        end else begin
             daccess_wen   <= da_wen;
+        end
+    end
+
+    always @(posedge cpu_clk or posedge cpu_rst) begin
+        if (cpu_rst) begin
+            daccess_wdata <= 32'h0;
+        end else begin
             daccess_wdata <= da_wdata;
         end
     end

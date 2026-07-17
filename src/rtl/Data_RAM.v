@@ -17,6 +17,9 @@ module Data_RAM (
 
     always @(posedge cpu_clk or posedge cpu_rst) begin
         data_valid <= cpu_rst ? 1'b0 : |data_ren;
+    end
+
+    always @(posedge cpu_clk or posedge cpu_rst) begin
         data_wresp <= cpu_rst ? 1'b0 : |data_wen;
     end
 

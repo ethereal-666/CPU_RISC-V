@@ -26,61 +26,121 @@ module divider #(
     wire y_negative = SIGNED_OP && y[WIDTH-1];
     wire [WIDTH-1:0] x_abs = x_negative ? (~x + 1'b1) : x;
     wire [WIDTH-1:0] y_abs = y_negative ? (~y + 1'b1) : y;
+    wire [WIDTH  :0] remainder_shift = {remainder[WIDTH-1:0], dividend[WIDTH-1]};
+    wire             remainder_ge_divisor = remainder_shift >= {1'b0, divisor};
 
     reg [WIDTH  :0] remainder_next;
     reg [WIDTH-1:0] quotient_next;
+
     always @(*) begin
-        remainder_next = {remainder[WIDTH-1:0], dividend[WIDTH-1]};
-        quotient_next  = {quotient[WIDTH-2:0], 1'b0};
-        if (remainder_next >= {1'b0, divisor}) begin
-            remainder_next = remainder_next - {1'b0, divisor};
-            quotient_next[0] = 1'b1;
+        if (remainder_ge_divisor) begin
+            remainder_next = remainder_shift - {1'b0, divisor};
+        end else begin
+            remainder_next = remainder_shift;
+        end
+    end
+
+    always @(*) begin
+        quotient_next = {quotient[WIDTH-2:0], remainder_ge_divisor};
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            z <= {WIDTH{1'b0}};
+        end else if (start && !busy && (y_abs == {WIDTH{1'b0}})) begin
+            z <= {WIDTH{1'b1}};
+        end else if (busy && (divisor != {WIDTH{1'b0}}) && (count == 1)) begin
+            z <= quotient_negative ? (~quotient_next + 1'b1) : quotient_next;
         end
     end
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            z                  <= {WIDTH{1'b0}};
-            r                  <= {WIDTH{1'b0}};
-            dividend           <= {WIDTH{1'b0}};
-            divisor            <= {WIDTH{1'b0}};
-            quotient           <= {WIDTH{1'b0}};
-            remainder          <= {(WIDTH+1){1'b0}};
-            count              <= {(WIDTH+1){1'b0}};
-            quotient_negative  <= 1'b0;
-            remainder_negative <= 1'b0;
-            busy               <= 1'b0;
+            r <= {WIDTH{1'b0}};
+        end else if (start && !busy && (y_abs == {WIDTH{1'b0}})) begin
+            r <= x;
+        end else if (busy && (divisor != {WIDTH{1'b0}}) && (count == 1)) begin
+            r <= remainder_negative ?
+                    (~remainder_next[WIDTH-1:0] + 1'b1) :
+                      remainder_next[WIDTH-1:0];
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            dividend <= {WIDTH{1'b0}};
         end else if (start && !busy) begin
-            dividend           <= x_abs;
-            divisor            <= y_abs;
-            quotient           <= {WIDTH{1'b0}};
-            remainder          <= {(WIDTH+1){1'b0}};
-            count              <= WIDTH;
-            quotient_negative  <= x_negative ^ y_negative;
-            remainder_negative <= x_negative;
-            busy               <= 1'b1;
-            if (y_abs == {WIDTH{1'b0}}) begin
-                z     <= {WIDTH{1'b1}};
-                r     <= x;
-                count <= 1;
-            end
+            dividend <= x_abs;
+        end else if (busy && (divisor != {WIDTH{1'b0}})) begin
+            dividend <= dividend << 1;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            divisor <= {WIDTH{1'b0}};
+        end else if (start && !busy) begin
+            divisor <= y_abs;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            quotient <= {WIDTH{1'b0}};
+        end else if (start && !busy) begin
+            quotient <= {WIDTH{1'b0}};
+        end else if (busy && (divisor != {WIDTH{1'b0}})) begin
+            quotient <= quotient_next;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            remainder <= {(WIDTH+1){1'b0}};
+        end else if (start && !busy) begin
+            remainder <= {(WIDTH+1){1'b0}};
+        end else if (busy && (divisor != {WIDTH{1'b0}})) begin
+            remainder <= remainder_next;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            count <= {(WIDTH+1){1'b0}};
+        end else if (start && !busy && (y_abs == {WIDTH{1'b0}})) begin
+            count <= 1;
+        end else if (start && !busy) begin
+            count <= WIDTH;
         end else if (busy) begin
             count <= count - 1'b1;
-            if (divisor == {WIDTH{1'b0}}) begin
-                busy <= 1'b0;
-            end else begin
-                dividend  <= dividend << 1;
-                quotient  <= quotient_next;
-                remainder <= remainder_next;
-                if (count == 1) begin
-                    z    <= quotient_negative ?
-                                (~quotient_next + 1'b1) : quotient_next;
-                    r    <= remainder_negative ?
-                                (~remainder_next[WIDTH-1:0] + 1'b1) :
-                                  remainder_next[WIDTH-1:0];
-                    busy <= 1'b0;
-                end
-            end
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            quotient_negative <= 1'b0;
+        end else if (start && !busy) begin
+            quotient_negative <= x_negative ^ y_negative;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            remainder_negative <= 1'b0;
+        end else if (start && !busy) begin
+            remainder_negative <= x_negative;
+        end
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            busy <= 1'b0;
+        end else if (start && !busy) begin
+            busy <= 1'b1;
+        end else if (busy && (divisor == {WIDTH{1'b0}})) begin
+            busy <= 1'b0;
+        end else if (busy && (count == 1)) begin
+            busy <= 1'b0;
         end
     end
 
