@@ -8,10 +8,13 @@ module ALU (
     input  wire [ 4:0]  op,
     input  wire [31:0]  a,
     input  wire [31:0]  b,
+    input  wire         valid,
+    input  wire         enable,
+    input  wire         is_mul_div,
 
     output reg  [31:0]  c,
     output reg          br,
-    output wire         busy
+    output wire         stall
 );
 
     wire        mul_flag, mulu_flag;
@@ -23,9 +26,17 @@ module ALU (
     wire [32:0] divu_quo, divu_rem;
     wire        div_busy, divu_busy;
     reg  [ 4:0] op_r;
+    reg         operation_started;  // 防止流水线暂停时重复启动乘除运算
+
+    wire unit_busy = mul_busy | mulu_busy | div_busy | divu_busy;
+    wire operation_start = valid && enable && is_mul_div &&
+                           !operation_started;
+    // 启动后暂时屏蔽乘除操作码，由内部运算单元继续执行。
+    wire [ 4:0] active_op = operation_start ? op :
+                            is_mul_div ? 5'h0 : op;
 
     always @(*) begin
-        case (op_r != 0 ? op_r : op)
+        case (op_r != 0 ? op_r : active_op)
             `ALU_ADD  : c = a + b;
             `ALU_SUB  : c = a - b;
             `ALU_AND  : c = a & b;
@@ -48,7 +59,7 @@ module ALU (
     end
 
     always @(*) begin
-        case (op)
+        case (active_op)
             `ALU_BEQ : br = a == b;
             `ALU_BNE : br = a != b;
             `ALU_BLT : br = $signed(a) <  $signed(b);
@@ -59,19 +70,35 @@ module ALU (
         endcase
     end
 
-    assign mul_flag  = (op == `ALU_MUL) | (op == `ALU_MULH);
-    assign mulu_flag = (op == `ALU_MULHU);
-    assign div_flag  = (op == `ALU_DIV) | (op == `ALU_MOD);
-    assign divu_flag = (op == `ALU_DIVU) | (op == `ALU_MODU);
-    assign busy      = mul_busy | mulu_busy | div_busy | divu_busy;
+    assign mul_flag  = (active_op == `ALU_MUL) | (active_op == `ALU_MULH);
+    assign mulu_flag = active_op == `ALU_MULHU;
+    assign div_flag  = (active_op == `ALU_DIV) | (active_op == `ALU_MOD);
+    assign divu_flag = (active_op == `ALU_DIVU) | (active_op == `ALU_MODU);
+    assign stall = valid && is_mul_div &&
+                   (!operation_started || unit_busy);
 
     always @(posedge clk or posedge rst) begin
         if (rst)
             op_r <= 5'h0;
         else if (mul_flag | mulu_flag | div_flag | divu_flag)
-            op_r <= op;
-        else if (!busy)
+            op_r <= active_op;
+        else if (!unit_busy)
             op_r <= 5'h0;
+        else
+            op_r <= op_r;
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            operation_started <= 1'b0;
+        else if (!valid || !is_mul_div)
+            operation_started <= 1'b0;
+        else if (operation_start)
+            operation_started <= 1'b1;
+        else if (!stall)
+            operation_started <= 1'b0;
+        else
+            operation_started <= operation_started;
     end
 
     multiplier #(32) U_mul (

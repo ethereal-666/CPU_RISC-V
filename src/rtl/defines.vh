@@ -71,6 +71,10 @@
 `define WB_EXT      2'b10
 `define WB_PC4      2'b00
 
+`define FWD_REG     2'b00
+`define FWD_MEM     2'b01
+`define FWD_WB      2'b10
+
 // Address Space
 `define MEM_BLOCK_MEMORY    32'h0000_0000   // 512KB (0x0000_0000 ~ 0x0007_FFFF)
 `define MEM_DDR3            32'h2000_0000   // 512MB (0x2000_0000 ~ 0x3FFF_FFFF)

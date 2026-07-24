@@ -5,9 +5,12 @@ verilog xil_defaultlib  --include "../../../../src/rtl" --include "../../../../s
 "../../../../miniRV_axi.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_clk_wiz.v" \
 "../../../../miniRV_axi.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.v" \
 "../../../../src/rtl/ALU.v" \
+"../../../../src/rtl/Branch_Predictor.v" \
 "../../../../src/rtl/Controller.v" \
 "../../../../src/rtl/Data_RAM.v" \
 "../../../../src/rtl/EXT.v" \
+"../../../../src/rtl/Hazard_Control.v" \
+"../../../../src/rtl/IF_Control.v" \
 "../../../../src/rtl/Inst_ROM.v" \
 "../../../../src/rtl/MEXT.v" \
 "../../../../src/rtl/MREQ.v" \
