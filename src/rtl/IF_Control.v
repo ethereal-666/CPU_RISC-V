@@ -12,6 +12,7 @@ module IF_Control (
     input  wire [31:0]  pred_target_i,
 
     input  wire         ifetch_valid_i,
+
     output wire         ifetch_req_o,
     output wire [31:0]  ifetch_addr_o,
 

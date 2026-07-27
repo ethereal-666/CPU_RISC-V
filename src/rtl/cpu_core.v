@@ -131,8 +131,6 @@ module cpu_core(
     wire        actual_taken;
     wire [31:0] actual_next_pc;
     wire [31:0] control_target;
-    wire        ex_is_branch;
-    wire        ex_is_jump;
     wire        ex_redirect;
     wire [31:0] redirect_pc;
 
@@ -166,16 +164,15 @@ module cpu_core(
         .clk_i           (cpu_clk),
         .rst_i           (cpu_rst),
         .fetch_pc_i      (pc),
-        .pred_taken_o    (predicted_taken),
-        .pred_target_o   (predicted_target),
         .resolve_en_i          (ex_resolve),
-        .is_branch_i           (ex_is_branch),
-        .is_jump_i             (ex_is_jump),
+        .resolve_npc_op_i      (id_ex_npc_op),
         .resolve_pc_i          (id_ex_pc),
         .resolved_pred_taken_i (id_ex_pred_taken),
         .actual_taken_i        (actual_taken),
         .actual_target_i       (control_target),
         .actual_next_pc_i      (actual_next_pc),
+        .pred_taken_o          (predicted_taken),
+        .pred_target_o         (predicted_target),
         .redirect_o            (ex_redirect),
         .redirect_pc_o         (redirect_pc)
     );
@@ -347,10 +344,10 @@ module cpu_core(
                                  ex_mem_pc4 : ex_mem_alu_c;
 
     // 前递优先级由冒险控制器统一判断。
-    assign ex_src1 = (forward1 == `FWD_MEM) ? ex_mem_forward_data :
-                     (forward1 == `FWD_WB)  ? mem_wb_wdata : id_ex_rd1;
-    assign ex_src2 = (forward2 == `FWD_MEM) ? ex_mem_forward_data :
-                     (forward2 == `FWD_WB)  ? mem_wb_wdata : id_ex_rd2;
+    assign ex_src1 = (forward1 == `FWD_EX_MEM) ? ex_mem_forward_data :
+                     (forward1 == `FWD_MEM_WB) ? mem_wb_wdata : id_ex_rd1;
+    assign ex_src2 = (forward2 == `FWD_EX_MEM) ? ex_mem_forward_data :
+                     (forward2 == `FWD_MEM_WB) ? mem_wb_wdata : id_ex_rd2;
 
     assign alu_a = id_ex_alua_sel ? ex_src1 : id_ex_pc;
     assign alu_b = id_ex_alub_sel ? ex_src2 : id_ex_sext;
@@ -374,9 +371,6 @@ module cpu_core(
 
     assign actual_taken = (id_ex_npc_op == `NPC_BRCH) ? alu_br :
                           (id_ex_npc_op != `NPC_PC4);
-    assign ex_is_branch = id_ex_npc_op == `NPC_BRCH;
-    assign ex_is_jump = (id_ex_npc_op == `NPC_JMP) ||
-                        (id_ex_npc_op == `NPC_JIRL);
     NPC U_NPC_EX (
         .op     (id_ex_npc_op),
         .pc     (id_ex_pc),

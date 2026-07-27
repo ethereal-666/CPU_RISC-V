@@ -57,22 +57,22 @@ module Hazard_Control (
     // 数据较新时优先选择EX/MEM级，其次选择MEM/WB级。
     always @(*) begin
         if (ex_mem_can_forward && (ex_mem_wR_i == ex_rR1_i))
-            forward1_o = `FWD_MEM;
+            forward1_o = `FWD_EX_MEM;
         else if (mem_wb_we_i && (mem_wb_wR_i != 5'h0) &&
                  (mem_wb_wR_i == ex_rR1_i))
-            forward1_o = `FWD_WB;
+            forward1_o = `FWD_MEM_WB;
         else
-            forward1_o = `FWD_REG;
+            forward1_o = `FWD_ID_EX;
     end
 
     always @(*) begin
         if (ex_mem_can_forward && (ex_mem_wR_i == ex_rR2_i))
-            forward2_o = `FWD_MEM;
+            forward2_o = `FWD_EX_MEM;
         else if (mem_wb_we_i && (mem_wb_wR_i != 5'h0) &&
                  (mem_wb_wR_i == ex_rR2_i))
-            forward2_o = `FWD_WB;
+            forward2_o = `FWD_MEM_WB;
         else
-            forward2_o = `FWD_REG;
+            forward2_o = `FWD_ID_EX;
     end
 
 endmodule
