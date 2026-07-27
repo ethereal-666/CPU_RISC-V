@@ -143,6 +143,7 @@ module cpu_core(
     wire        mem_wb_write_enable;
 
     /***************************** IF *****************************/
+    // 取指控制：管理PC、暂停重取和ROM请求对齐。
     IF_Control U_if_control (
         .clk_i            (cpu_clk),
         .rst_i            (cpu_rst),
@@ -160,6 +161,7 @@ module cpu_core(
         .req_pred_taken_o (if_req_pred_taken)
     );
 
+    // 分支预测：IF阶段预测，EX阶段校验并重定向。
     Branch_Predictor U_branch_predictor (
         .clk_i           (cpu_clk),
         .rst_i           (cpu_rst),
@@ -242,6 +244,7 @@ module cpu_core(
                      (mem_wb_wR == rR2_id)) ? mem_wb_wdata : rf_rd2;
 
     /************************ Hazard control ************************/
+    // 冒险控制：统一产生暂停、清空和前递选择。
     Hazard_Control U_hazard_control (
         .if_id_valid_i    (if_id_valid),
         .id_rR1_i         (rR1_id),
