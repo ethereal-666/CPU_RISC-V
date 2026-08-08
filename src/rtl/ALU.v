@@ -44,6 +44,7 @@ module ALU (
             `ALU_XOR  : c = a ^ b;
             `ALU_SLT  : c = $signed(a) < $signed(b);
             `ALU_SLTU : c = a < b;
+            `ALU_NOR  : c = ~(a | b);
             `ALU_SLL  : c = a << b[4:0];
             `ALU_SRL  : c = a >> b[4:0];
             `ALU_SRA  : c = $signed(a) >>> b[4:0];

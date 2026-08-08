@@ -1,0 +1,6 @@
+# Keep only reproducible IP configuration in Git. Vivado regenerates all
+# simulation models, stubs, checkpoints and reports from the XCI files.
+*
+!*/
+!*.xci
+!.gitignore

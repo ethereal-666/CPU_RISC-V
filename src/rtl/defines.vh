@@ -1,8 +1,8 @@
 // `define RUN_TRACE
 
-// `define ENABLE_ICACHE
-// `define ENABLE_DCACHE
-// `define USE_DDR
+`define ENABLE_ICACHE
+`define ENABLE_DCACHE
+`define USE_DDR
 
 `define PC_INIT_VAL 32'h0
 
@@ -28,6 +28,7 @@
 `define ALU_SRL     5'h07
 `define ALU_SRA     5'h08
 `define ALU_SLTU    5'h09
+`define ALU_NOR     5'h0A
 `define ALU_BEQ     5'h0B
 `define ALU_BNE     5'h0C
 `define ALU_BLT     5'h0D

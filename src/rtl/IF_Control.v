@@ -22,14 +22,22 @@ module IF_Control (
     output reg          req_pred_taken_o
 );
 
+    reg outstanding_r;
+    reg cancelled_r;
+
+    wire response = outstanding_r && ifetch_valid_i;
     wire [31:0] predicted_pc = pred_taken_i ? pred_target_i : pc_o + 32'h4;
-    wire replay_fetch = front_stall_i && ifetch_valid_i && req_valid_o &&
+    wire replay_fetch = response && front_stall_i && !cancelled_r &&
                         !redirect_i;
     wire pc_write = redirect_i || ifetch_req_o || replay_fetch;
     wire [31:0] next_pc = redirect_i ? redirect_pc_i :
                           replay_fetch ? req_pc_o : predicted_pc;
 
-    assign ifetch_req_o  = !rst_i && !front_stall_i && !redirect_i;
+    // The SoC-side ICache/AXI path has no request-ready signal.  Therefore
+    // only one fetch may be outstanding; a request is a one-cycle pulse and
+    // its metadata must be retained until ifetch_valid_i returns.
+    assign ifetch_req_o  = !rst_i && !front_stall_i && !redirect_i &&
+                           !outstanding_r;
     assign ifetch_addr_o = pc_o;
 
     PC U_PC (
@@ -40,20 +48,33 @@ module IF_Control (
         .pc    (pc_o)
     );
 
-    // 保存请求信息，使其与同步ROM返回的指令对齐。
+    // 保存请求信息，使其与可变延迟的 Cache/AXI 响应对齐。
     always @(posedge clk_i or posedge rst_i) begin
         if (rst_i) begin
+            outstanding_r        <= 1'b0;
+            cancelled_r          <= 1'b0;
             req_valid_o      <= 1'b0;
             req_pc_o         <= 32'h0;
             req_pred_taken_o <= 1'b0;
-        end else if (ifetch_req_o) begin
-            req_valid_o      <= 1'b1;
-            req_pc_o         <= pc_o;
-            req_pred_taken_o <= pred_taken_i;
         end else begin
-            req_valid_o      <= 1'b0;
-            req_pc_o         <= req_pc_o;
-            req_pred_taken_o <= req_pred_taken_o;
+            if (response) begin
+                outstanding_r <= 1'b0;
+                cancelled_r   <= 1'b0;
+                req_valid_o   <= 1'b0;
+            end
+
+            if (redirect_i && outstanding_r && !response) begin
+                cancelled_r <= 1'b1;
+                req_valid_o <= 1'b0;
+            end
+
+            if (ifetch_req_o) begin
+                outstanding_r        <= 1'b1;
+                cancelled_r          <= 1'b0;
+                req_valid_o          <= 1'b1;
+                req_pc_o             <= pc_o;
+                req_pred_taken_o     <= pred_taken_i;
+            end
         end
     end
 

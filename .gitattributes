@@ -1,0 +1,5 @@
+# Keep WSL/Linux build scripts executable by /bin/sh after a Windows checkout.
+*.sh text eol=lf
+
+# Keep native Windows launchers in their expected line-ending format.
+*.bat text eol=crlf

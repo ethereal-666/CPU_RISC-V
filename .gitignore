@@ -8,3 +8,22 @@ dist/
 *.exe
 *.o
 *.obj
+
+# Vivado-generated project state and build products. The project is rebuilt
+# from miniLA.xpr, src/, miniLA.srcs/ and scripts/.
+.Xil/
+*.cache/
+*.gen/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+xsim.dir/
+*.jou
+*.str
+*.pb
+*.wdb
+*.dcp
+*.bit
+*.ltx
+*.mif

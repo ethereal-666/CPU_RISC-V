@@ -34,6 +34,7 @@ module Controller (
     wire SUB_W     = (inst_31_15[31:15] == 17'h00022);
     wire SLT       = (inst_31_15[31:15] == 17'h00024);
     wire SLTU      = (inst_31_15[31:15] == 17'h00025);
+    wire NOR       = (inst_31_15[31:15] == 17'h00028);
     wire AND       = (inst_31_15[31:15] == 17'h00029);
     wire OR        = (inst_31_15[31:15] == 17'h0002A);
     wire XOR       = (inst_31_15[31:15] == 17'h0002B);
@@ -93,6 +94,7 @@ module Controller (
     wire ALU_OP_XOR   = XOR | XORI;
     wire ALU_OP_SLT   = SLT | SLTI;
     wire ALU_OP_SLTU  = SLTU | SLTUI;
+    wire ALU_OP_NOR   = NOR;
     wire ALU_OP_SLL   = SLL_W | SLLI_W;
     wire ALU_OP_SRL   = SRL_W | SRLI_W;
     wire ALU_OP_SRA   = SRA_W | SRAI_W;
@@ -139,7 +141,7 @@ module Controller (
     // rf_we
     wire RF_OP_WE = LU12I_W | PCADDU12I |
                     ADDI_W | SLTI | SLTUI | ANDI | ORI | XORI |
-                    ADD_W | SUB_W | SLT | SLTU | AND | OR | XOR |
+                    ADD_W | SUB_W | SLT | SLTU | NOR | AND | OR | XOR |
                     SLL_W | SRL_W | SRA_W | SLLI_W | SRLI_W | SRAI_W |
                     MUL_W | MULH_W | MULH_WU |
                     DIV_W | DIV_WU | MOD_W | MOD_WU |
@@ -152,7 +154,7 @@ module Controller (
     // rf_wsel
     wire WB_OP_ALU = PCADDU12I |
                      ADDI_W | SLTI | SLTUI | ANDI | ORI | XORI |
-                     ADD_W | SUB_W | SLT | SLTU | AND | OR | XOR |
+                     ADD_W | SUB_W | SLT | SLTU | NOR | AND | OR | XOR |
                      SLL_W | SRL_W | SRA_W | SLLI_W | SRLI_W | SRAI_W |
                      MUL_W | MULH_W | MULH_WU |
                      DIV_W | DIV_WU | MOD_W | MOD_WU;
@@ -185,6 +187,7 @@ module Controller (
                     {5{ALU_OP_XOR  }} & `ALU_XOR   |
                     {5{ALU_OP_SLT  }} & `ALU_SLT   |
                     {5{ALU_OP_SLTU }} & `ALU_SLTU  |
+                    {5{ALU_OP_NOR  }} & `ALU_NOR   |
                     {5{ALU_OP_SLL  }} & `ALU_SLL   |
                     {5{ALU_OP_SRL  }} & `ALU_SRL   |
                     {5{ALU_OP_SRA  }} & `ALU_SRA   |

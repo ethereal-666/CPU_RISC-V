@@ -1,1 +1,0 @@
-"soc_simple_tb" -s "soc_simple_tb_behav" 

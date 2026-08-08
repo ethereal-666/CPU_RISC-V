@@ -13,8 +13,58 @@ module soc_simple_tb();
     wire        tx;
     wire        rx = 1;
 
-    initial #590 rst = 0;
+    integer if_req_count  = 0;
+    integer if_rsp_count  = 0;
+    integer data_rd_count = 0;
+    integer data_wr_count = 0;
+    integer axi_ar_count  = 0;
+    integer axi_r_count   = 0;
+    integer axi_aw_count  = 0;
+    integer axi_w_count   = 0;
+    integer axi_b_count   = 0;
+    integer wb_count      = 0;
+
+    // Release reset between rising clock edges to avoid a race with the
+    // CPU's reset-edge detector when RUN_TRACE bypasses the clock wizard.
+    initial #595 rst = 0;
     always #5 clk = !clk;
+
+    always @(posedge DUT.sys_clk) begin
+        if (!DUT.sys_rst) begin
+            if (DUT.U_cpu.U_core.ifetch_req)
+                if_req_count <= if_req_count + 1;
+            if (DUT.U_cpu.U_core.ifetch_valid)
+                if_rsp_count <= if_rsp_count + 1;
+            if (|DUT.U_cpu.U_core.daccess_ren)
+                data_rd_count <= data_rd_count + 1;
+            if (|DUT.U_cpu.U_core.daccess_wen)
+                data_wr_count <= data_wr_count + 1;
+            if (DUT.cpu_arvalid && DUT.cpu_arready)
+                axi_ar_count <= axi_ar_count + 1;
+            if (DUT.cpu_rvalid && DUT.cpu_rready)
+                axi_r_count <= axi_r_count + 1;
+            if (DUT.cpu_awvalid && DUT.cpu_awready)
+                axi_aw_count <= axi_aw_count + 1;
+            if (DUT.cpu_wvalid && DUT.cpu_wready)
+                axi_w_count <= axi_w_count + 1;
+            if (DUT.cpu_bvalid && DUT.cpu_bready)
+                axi_b_count <= axi_b_count + 1;
+            if (DUT.U_cpu.U_core.mem_wb_write_enable)
+                wb_count <= wb_count + 1;
+        end
+    end
+
+    initial begin
+        #200000;
+        $display(
+            "AB_SMOKE if_req=%0d if_rsp=%0d data_rd=%0d data_wr=%0d axi_ar=%0d axi_r=%0d axi_aw=%0d axi_w=%0d axi_b=%0d wb=%0d pc=%08x",
+            if_req_count, if_rsp_count, data_rd_count, data_wr_count,
+            axi_ar_count, axi_r_count, axi_aw_count, axi_w_count,
+            axi_b_count, wb_count, DUT.U_cpu.U_core.pc
+        );
+        if (if_req_count == 0 || if_rsp_count == 0 || axi_ar_count == 0 || axi_r_count == 0)
+            $error("AB_SMOKE_FAIL: instruction AXI read path made no progress");
+    end
 
     always @(*) begin
         if (DUT.U_cpu.U_core.ifetch_valid && DUT.U_cpu.U_core.ifetch_inst == 32'h2b0000) begin
